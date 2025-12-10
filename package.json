@@ -1,0 +1,23 @@
+{
+  "name": "koliyonet-frontend",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite --port 5173",
+    "preview": "vite preview --port 5174"
+  },
+  "dependencies": {
+    "@zxing/browser": "^0.1.5",
+    "axios": "^1.7.7",
+    "socket.io": "^4.8.1",
+    "vue": "^3.4.26",
+    "vue-router": "^4.6.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.5",
+    "@vitejs/plugin-vue-jsx": "^5.1.1",
+    "vite": "^5.4.1"
+  },
+  "type": "module"
+}
