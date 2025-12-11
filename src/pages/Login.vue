@@ -51,22 +51,9 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import {setAuthToken}  from "../api.js";
-async function doLogin() {
-  try {
-    const { data } = await login(form.username, form.password)
-    // data.token geldiğini varsayıyorum
-    setAuthToken(data.token)
-    // sonra router.push vs...
-  } catch (e) {
-    error.value = e?.response?.data?.error || e.message
-  }
-}
-
+import { setAuthToken } from '../api.js'   // varsa kullan, yoksa dursun
 
 const router = useRouter()
-
-
 
 const username = ref('')
 const password = ref('')
@@ -97,16 +84,32 @@ async function onSubmit() {
 
     const data = await resp.json()
 
-    // JWT token + kullanıcı bilgilerini localStorage'a yaz
+    // ✅ JWT token
     if (data.token) {
       localStorage.setItem('imi_token', data.token)
-    }
-    if (data.user) {
-      localStorage.setItem('imi_user', JSON.stringify(data.user))
+      // İstersen setAuthToken da kullanabilirsin:
+      // setAuthToken(data.token)
     }
 
-    // Girişten sonra ana sayfaya yönlendir
-    // Burayı proje yapına göre değiştirebilirsin (ör: '/koligoruntule')
+    // ✅ Kullanıcı objesi
+    if (data.user) {
+      localStorage.setItem('imi_user', JSON.stringify(data.user))
+
+      // 🔥 Log’larda kullanacağımız düzgün kullanıcı adı
+      const uname =
+          data.user.username ||
+          data.user.name ||
+          data.user.kullanici_adi ||
+          username.value
+
+      localStorage.setItem('imi_username', uname)
+    } else {
+      // user objesi gelmiyorsa, en azından girilen username’i kaydedelim
+      localStorage.setItem('imi_user', JSON.stringify({ username: username.value }))
+      localStorage.setItem('imi_username', username.value)
+    }
+
+    // Girişten sonra yönlendirme
     const redirectTarget = router.currentRoute.value.query.redirect || '/'
     router.push(redirectTarget)
   } catch (e) {

@@ -117,10 +117,20 @@ const api3 ={
 
 }
 api.interceptors.request.use((config) => {
+    // Token her zaman header’a yazılsın (yeniden giriş yapılmış olabilir)
     const token = localStorage.getItem('imi_token')
     if (token) {
+        config.headers = config.headers || {}
         config.headers.Authorization = `Bearer ${token}`
     }
+
+    // 🔥 Kullanıcı adı varsa X-User header’ına ekle
+    const username = localStorage.getItem('imi_username')
+    if (username) {
+        config.headers = config.headers || {}
+        config.headers['X-User'] = username
+    }
+
     return config
 })
 /* ================= Public API Wrapper ================= */
