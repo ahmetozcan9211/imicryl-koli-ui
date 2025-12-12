@@ -1018,4 +1018,20 @@ input:focus, select:focus {
   border:1px solid #fecaca;
   color:#991b1b;
 }
+/* ✅ Tablo taşınca kaymasın, yatay scroll olsun */
+.table{
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ✅ Thead ve satırlar aynı genişlikte kalsın */
+.thead,
+.tbody .tr{
+  min-width: 1320px; /* kolon toplamı + gap için güvenli */
+}
+
+/* (İsteğe bağlı) scroll bar çok aşağıda olmasın */
+.table{
+  padding-bottom: 6px;
+}
 </style>
