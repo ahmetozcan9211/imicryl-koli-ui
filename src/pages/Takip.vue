@@ -421,6 +421,7 @@ input:focus, select:focus{ border-color:#111827; box-shadow:0 0 0 3px rgba(17,24
   overflow: visible !important;
   text-overflow: unset !important;
   white-space: normal !important;
+  font-size: x-small !important;
 }
 .empty.tiny{ font-size:12px }
 .sub-box{ margin:4px 4px 8px 40px }
