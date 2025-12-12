@@ -135,7 +135,7 @@
                   :key="b.box_id || b.kolikodu"
                   class="tr box-row"
               >
-                <div class="td w140 mono">{{ b.kolikodu || '-' }}</div>
+                <div class="td w140 mono kolikodu-full">{{ b.kolikodu || '-' }}</div>
                 <div class="td w100">
                   <span class="badge" :class="'st-' + (b.durum || 'draft')">
                     {{ b.durum || 'draft' }}
@@ -416,6 +416,11 @@ input:focus, select:focus{ border-color:#111827; box-shadow:0 0 0 3px rgba(17,24
 .empty{
   color:#6b7280; background:#fafafa; padding:10px; border:1px dashed #e5e7eb;
   border-radius:10px; text-align:center;
+}
+.box-row .td.kolikodu-full {
+  overflow: visible !important;
+  text-overflow: unset !important;
+  white-space: normal !important;
 }
 .empty.tiny{ font-size:12px }
 .sub-box{ margin:4px 4px 8px 40px }

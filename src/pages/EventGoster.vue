@@ -64,7 +64,7 @@ async function loadEvents(){
     events.value = Array.isArray(data) ? data : []
   }catch(e){
     console.error(e)
-  }finally{ß
+  }finally{
     loading.value = false
   }
 }
