@@ -379,9 +379,10 @@ const sortedOrders = computed(() => {
     }
 
     // string
-    return String(va).localeCompare(String(vb), 'tr', { numeric: true, sensitivity: 'base' }) * dir
+    return String(va).localeCompare(String(vb), 'tr', {numeric: true, sensitivity: 'base'}) * dir
   })
 })
+
 
 const fullyCoveredCount = computed(() => orders.value.filter(o => o.fully_covered).length)
 const unmetCount = computed(() => orders.value.filter(o => !o.fully_covered).length)
@@ -849,33 +850,24 @@ input:focus, select:focus {
   margin-top: 6px
 }
 
+/* ✅ Scroll yok: kolonları sığdır */
 .thead, .tr {
   display: grid;
-  grid-template-columns: 90px 120px 80px 120px 140px 140px 140px 140px 160px 90px;
-  gap: 8px;
+  /* toplam ~ 1060-1120px + gap ile 1200px’e sığar */
+  grid-template-columns: 80px 90px 110px 60px 80px 110px 110px 110px 140px 70px;
+  gap: 6px; /* 8 yerine 6 */
   align-items: center;
 }
 
-.thead {
-  font-weight: 600;
-  color: #374151;
-  padding: 6px 8px;
-  background: #f8fafc;
-  border: 1px solid #eef2f7;
-  border-radius: 10px;
-}
+/* biraz daha kompakt görünüm (taşmayı azaltır) */
+.thead { padding: 6px 6px; }
+.tbody .tr { padding: 7px 6px; }
 
-.tbody .tr {
-  padding: 8px 8px;
-  border-bottom: 1px solid #f3f4f6;
-  background: #fff;
-  border-radius: 10px;
-}
-
-.td, .th {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap
+/* tarih hücresi uzun ise tek satırda kalıp taşmasın diye */
+.td, .th{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 
 /* ✅ SIRALANABİLİR BAŞLIK */
@@ -1018,20 +1010,5 @@ input:focus, select:focus {
   border:1px solid #fecaca;
   color:#991b1b;
 }
-/* ✅ Tablo taşınca kaymasın, yatay scroll olsun */
-.table{
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
 
-/* ✅ Thead ve satırlar aynı genişlikte kalsın */
-.thead,
-.tbody .tr{
-  min-width: 1320px; /* kolon toplamı + gap için güvenli */
-}
-
-/* (İsteğe bağlı) scroll bar çok aşağıda olmasın */
-.table{
-  padding-bottom: 6px;
-}
 </style>
