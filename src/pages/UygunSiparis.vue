@@ -101,20 +101,82 @@
 
       <div v-else class="table">
         <div class="thead">
-          <div class="th w90">Belge</div>
-          <div class="th w120">Sipariş No</div>
-          <div class="th w80 right">Satır</div>
-          <div class="th w120">Koli</div>
-          <div class="th w140 right">Sipariş Toplamı</div>
-          <div class="th w140 right">Serbest Stok</div>
-          <div class="th w140 right">Eksik</div>
-          <div class="th w140">Durum</div>
-          <div class="th w160">Tarih</div>
+          <div class="th w90 sortable" @click="toggleSort('ordstat')">
+            Belge
+            <span class="sort-icon" v-if="sort.key === 'ordstat'">
+              {{ sort.dir === 'asc' ? '▲' : '▼' }}
+            </span>
+          </div>
+
+          <div class="th w120 sortable" @click="toggleSort('doctype')">
+            Belge Türü
+            <span class="sort-icon" v-if="sort.key === 'doctype'">
+              {{ sort.dir === 'asc' ? '▲' : '▼' }}
+            </span>
+          </div>
+
+          <div class="th w120 sortable" @click="toggleSort('docnum')">
+            Sipariş No
+            <span class="sort-icon" v-if="sort.key === 'docnum'">
+              {{ sort.dir === 'asc' ? '▲' : '▼' }}
+            </span>
+          </div>
+
+          <div class="th w80 right sortable" @click="toggleSort('line_count')">
+            Satır
+            <span class="sort-icon" v-if="sort.key === 'line_count'">
+              {{ sort.dir === 'asc' ? '▲' : '▼' }}
+            </span>
+          </div>
+
+          <div class="th w120 sortable" @click="toggleSort('has_box')">
+            Koli
+            <span class="sort-icon" v-if="sort.key === 'has_box'">
+              {{ sort.dir === 'asc' ? '▲' : '▼' }}
+            </span>
+          </div>
+
+          <div class="th w140 right sortable" @click="toggleSort('ordered_total')">
+            Sipariş Toplamı
+            <span class="sort-icon" v-if="sort.key === 'ordered_total'">
+              {{ sort.dir === 'asc' ? '▲' : '▼' }}
+            </span>
+          </div>
+
+          <div class="th w140 right sortable" @click="toggleSort('stock_total')">
+            Serbest Stok
+            <span class="sort-icon" v-if="sort.key === 'stock_total'">
+              {{ sort.dir === 'asc' ? '▲' : '▼' }}
+            </span>
+          </div>
+
+          <div class="th w140 right sortable" @click="toggleSort('missing_total')">
+            Eksik
+            <span class="sort-icon" v-if="sort.key === 'missing_total'">
+              {{ sort.dir === 'asc' ? '▲' : '▼' }}
+            </span>
+          </div>
+
+          <div class="th w140 sortable" @click="toggleSort('fully_covered')">
+            Durum
+            <span class="sort-icon" v-if="sort.key === 'fully_covered'">
+              {{ sort.dir === 'asc' ? '▲' : '▼' }}
+            </span>
+          </div>
+
+          <div class="th w160 sortable" @click="toggleSort('createdat')">
+            Tarih
+            <span class="sort-icon" v-if="sort.key === 'createdat'">
+              {{ sort.dir === 'asc' ? '▲' : '▼' }}
+            </span>
+          </div>
+
           <div class="th w90"></div>
         </div>
+
         <div class="tbody">
           <div
-              v-for="o in orders"
+              v-for="o in sortedOrders"
               :key="o.doctype + '|' + o.docnum"
               class="tr"
               :class="{
@@ -140,18 +202,18 @@
             <div class="td w120 mono">{{ o.docnum }}</div>
             <div class="td w80 right">{{ o.line_count }}</div>
             <div class="td w120">
-  <span
-      v-if="o.has_box"
-      class="badge badge-ok"
-  >
-    📦 Var
-  </span>
+              <span
+                  v-if="o.has_box"
+                  class="badge badge-ok"
+              >
+                📦 Var
+              </span>
               <span
                   v-else
                   class="badge badge-no"
               >
-    Yok
-  </span>
+                Yok
+              </span>
             </div>
             <div class="td w140 right">{{ o.ordered_total }}</div>
             <div class="td w140 right">{{ o.stock_total }}</div>
@@ -262,7 +324,64 @@ const form = reactive({
 const loading = ref(false)
 const exporting = ref(false)
 const msg = reactive({err: '', info: ''})
+
 const orders = ref([])
+
+/* ✅ SIRALAMA STATE */
+const sort = ref({
+  key: null,     // hangi kolon
+  dir: 'asc'     // asc | desc
+})
+
+function toggleSort (key) {
+  if (sort.value.key === key) {
+    sort.value.dir = sort.value.dir === 'asc' ? 'desc' : 'asc'
+  } else {
+    sort.value.key = key
+    sort.value.dir = 'asc'
+  }
+}
+
+/* ✅ SIRALI LİSTE (orders değişmez) */
+const sortedOrders = computed(() => {
+  const arr = [...orders.value]
+  if (!sort.value.key) return arr
+
+  const dir = sort.value.dir === 'asc' ? 1 : -1
+  const key = sort.value.key
+
+  return arr.sort((a, b) => {
+    let va = a[key]
+    let vb = b[key]
+
+    if (va == null && vb == null) return 0
+    if (va == null) return -1 * dir
+    if (vb == null) return 1 * dir
+
+    // boolean
+    if (typeof va === 'boolean' || typeof vb === 'boolean') {
+      va = va ? 1 : 0
+      vb = vb ? 1 : 0
+      return (va - vb) * dir
+    }
+
+    // number (veya sayıya çevrilebilen)
+    const na = Number(va)
+    const nb = Number(vb)
+    const bothNumeric = !Number.isNaN(na) && !Number.isNaN(nb) && (typeof va !== 'string' || va.trim() !== '') && (typeof vb !== 'string' || vb.trim() !== '')
+    if (bothNumeric) {
+      return (na - nb) * dir
+    }
+
+    // date (createdat vs)
+    if (key === 'createdat') {
+      return (new Date(va) - new Date(vb)) * dir
+    }
+
+    // string
+    return String(va).localeCompare(String(vb), 'tr', { numeric: true, sensitivity: 'base' }) * dir
+  })
+})
 
 const fullyCoveredCount = computed(() => orders.value.filter(o => o.fully_covered).length)
 const unmetCount = computed(() => orders.value.filter(o => !o.fully_covered).length)
@@ -757,6 +876,20 @@ input:focus, select:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap
+}
+
+/* ✅ SIRALANABİLİR BAŞLIK */
+.sortable{
+  cursor:pointer;
+  user-select:none;
+}
+.sortable:hover{
+  color:#111827;
+}
+.sort-icon{
+  margin-left:6px;
+  font-size:11px;
+  opacity:.7;
 }
 
 .w90 {
